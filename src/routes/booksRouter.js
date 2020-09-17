@@ -22,7 +22,8 @@ const { request, response } = require('express');
 const NOSTRING_REGEX = /^\d+$/;
 
 booksRouter.get('/books', async (request, response) => {
-  const books = await getAllBooks();
+  console.log('console log de request.query:', request.query);
+  const books = await getAllBooks(request.query.title);
   response.status(OK).json(books);
 });
 
@@ -83,30 +84,53 @@ booksRouter.post(
 );
 
 // Update a Book
-booksRouter.put('/books/:bookId', async (request, response) => {
-  console.log('console log de :', request.body, request.params);
-  const { bookId } = request.params;
-  const data = request.body;
-  const updateBooks = await updateBook(bookId, data);
+booksRouter.put(
+  '/books/:bookId',
+  authenticateJWT,
+  async (request, response) => {
+    console.log('console log de :', request.body, request.params);
+    const { roleAdmin } = request.user;
+    if (roleAdmin === false) {
+      throw new UnAuthorizedError(
+        'Accès non autorisé',
+        'Vous devez être admin pour poster une annonce de livre',
+      );
+    }
+    const { bookId } = request.params;
+    const data = request.body;
+    const updateBooks = await updateBook(bookId, data);
 
-  if (!updateBooks) {
-    throw new NotFoundError();
-  }
-  response.status(OK).json({
-    updateBooks,
-    message: "l'annonce de livre à bien été modifié",
-  });
-});
+    if (!updateBooks) {
+      throw new NotFoundError();
+    }
+    response.status(OK).json({
+      updateBooks,
+      message: "l'annonce de livre à bien été modifié",
+    });
+  },
+);
 
 // Delete a Book
-booksRouter.delete('/books/:title', async (request, response) => {
-  const deleteBooks = await deleteBook(request.params.title);
-  if (!deleteBooks) {
-    throw new NotFoundError();
-  }
-  response
-    .status(OK)
-    .json({ message: "L'annonce de livre a été supprimé" });
-});
+booksRouter.delete(
+  '/books/:title',
+  authenticateJWT,
+  async (request, response) => {
+    const { roleAdmin } = request.user;
+    if (roleAdmin === false) {
+      throw new UnAuthorizedError(
+        'Accès non autorisé',
+        'Vous devez être admin pour poster une annonce de livre',
+      );
+    }
+
+    const deleteBooks = await deleteBook(request.params.title);
+    if (!deleteBooks) {
+      throw new NotFoundError();
+    }
+    response
+      .status(OK)
+      .json({ message: "L'annonce de livre a été supprimé" });
+  },
+);
 
 module.exports = booksRouter;

@@ -36,10 +36,18 @@ module.exports = {
     });
   },
 
-  getAllBooks: () => {
-    return Books.findAll({
-      attributes: booksAttributes,
-    });
+  getAllBooks: async (data) => {
+    if (data) {
+      return await Books.findAll({
+        where: { title: data },
+        attributes: booksAttributes,
+        raw: true,
+      });
+    } else {
+      return await Books.findAll({
+        attributes: booksAttributes,
+      });
+    }
   },
 
   getBook: (title) => {
