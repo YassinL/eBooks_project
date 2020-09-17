@@ -1,6 +1,7 @@
 const express = require('express');
 require('express-async-errors');
 const booksRouter = express.Router();
+const { authenticateJWT } = require('../utils/jwt');
 
 const upload = require('../middlewares/upload');
 const {
@@ -13,6 +14,7 @@ const {
 const {
   BadRequestError,
   NotFoundError,
+  UnAuthorizedError,
 } = require('../helpers/errors');
 const { CREATED, OK } = require('../helpers/status_code');
 const { request, response } = require('express');
@@ -38,9 +40,18 @@ booksRouter.get('/books/:title', async (request, response) => {
 
 booksRouter.post(
   '/books',
+  authenticateJWT,
   upload.single('photo'),
   async (request, response) => {
     const { ISBN, summary } = request.body;
+    const { roleAdmin } = request.user;
+
+    if (roleAdmin === false) {
+      throw new UnAuthorizedError(
+        'Accès non autorisé',
+        'Vous devez être admin pour poster une annonce de livre',
+      );
+    }
     if (!NOSTRING_REGEX.test(ISBN)) {
       throw new BadRequestError(
         'Mauvaise requête',

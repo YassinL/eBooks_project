@@ -11,7 +11,7 @@ module.exports = {
     return jwt.sign(
       {
         userId: userData.id,
-        userRole: userData.role,
+        roleAdmin: userData.roleAdmin,
       },
       secret,
       { expiresIn: '4h' },
