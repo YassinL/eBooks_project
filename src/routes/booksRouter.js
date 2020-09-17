@@ -1,8 +1,8 @@
 const express = require('express');
 require('express-async-errors');
 const booksRouter = express.Router();
-const { authenticateJWT } = require('../utils/jwt');
 
+const { authenticateJWT } = require('../utils/jwt');
 const upload = require('../middlewares/upload');
 const {
   addBook,
@@ -82,18 +82,23 @@ booksRouter.post(
   },
 );
 
-// Ne fonctionne pas encore, problèmes
-booksRouter.put('/books/:title', async (request, response) => {
-  const updateBooks = await updateBook(
-    request.body,
-    request.params.title,
-  );
+// Update a Book
+booksRouter.put('/books/:bookId', async (request, response) => {
+  console.log('console log de :', request.body, request.params);
+  const { bookId } = request.params;
+  const data = request.body;
+  const updateBooks = await updateBook(bookId, data);
+
   if (!updateBooks) {
     throw new NotFoundError();
   }
-  response.status(OK).json(updateBooks);
+  response.status(OK).json({
+    updateBooks,
+    message: "l'annonce de livre à bien été modifié",
+  });
 });
 
+// Delete a Book
 booksRouter.delete('/books/:title', async (request, response) => {
   const deleteBooks = await deleteBook(request.params.title);
   if (!deleteBooks) {

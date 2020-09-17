@@ -48,4 +48,10 @@ module.exports = {
   checkPassword: (password, userPassword) => {
     return bcrypt.compare(password, userPassword);
   },
+
+  deleteUser: (email) => {
+    return Users.destroy({
+      where: { email: email },
+    });
+  },
 };

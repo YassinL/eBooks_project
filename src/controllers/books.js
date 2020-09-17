@@ -55,14 +55,34 @@ module.exports = {
     });
   },
 
-  updateBook: async (data, title) => {
-    const bookFound = await Books.findOne({
-      where: { title: title },
-      attributes: booksAttributes,
+  updateBook: async (bookId, data) => {
+    const [, affectedRow] = await Books.update(data, {
+      where: { id: bookId },
+      returning: true,
+      plain: true,
     });
-    if (!bookFound) {
-      return bookFound;
-    }
-    return Books.update(data);
+    const {
+      id,
+      ISBN,
+      title,
+      summary,
+      author,
+      publicationDate,
+      pagesNumber,
+      language,
+      photo,
+    } = affectedRow;
+    const updatedData = {
+      id,
+      ISBN,
+      title,
+      summary,
+      author,
+      publicationDate,
+      pagesNumber,
+      language,
+      photo,
+    };
+    return updatedData;
   },
 };
