@@ -36,6 +36,11 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
+      roleAdmin: {
+        allowNull: false,
+        type: Sequelize.BOOLEAN,
+        default: false,
+      },
       createdAt: {
         timestamps: false,
         allowNull: false,

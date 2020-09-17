@@ -5,7 +5,7 @@ const models = require('../../models');
 const { Users } = models;
 
 module.exports = {
-  addUser: async (data) => {
+  addUser: async (props) => {
     const {
       firstName,
       lastName,
@@ -13,7 +13,8 @@ module.exports = {
       password,
       birthday,
       phoneNumber,
-    } = data;
+      roleAdmin,
+    } = props;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -25,6 +26,7 @@ module.exports = {
       password: hashedPassword,
       birthday,
       phoneNumber,
+      roleAdmin,
     });
   },
 

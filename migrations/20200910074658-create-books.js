@@ -36,10 +36,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      photo: {
-        allowNull: false,
-        type: Sequelize.BLOB('long'),
-      },
+      // photo: {
+      //   allowNull: false,
+      //   type: Sequelize.STRING(255),
+      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

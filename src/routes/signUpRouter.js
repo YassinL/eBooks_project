@@ -1,5 +1,6 @@
 const express = require('express');
 const signUpRouter = express.Router();
+require('express-async-errors');
 const usersController = require('../controllers/users');
 
 const {

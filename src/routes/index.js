@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const signUpRouter = require('./signUp');
+const signUpRouter = require('./signUpRouter');
+const signInRouter = require('./signInRouter');
 const booksRouter = require('./booksRouter');
 
 const bodyParser = require('body-parser');
@@ -16,6 +17,7 @@ router.get('/', (request, response) => {
 
 // Routes
 router.use('/api', signUpRouter);
+router.use('/api', signInRouter);
 router.use('/api', booksRouter);
 
 module.exports = router;
