@@ -11,6 +11,7 @@ const {
   deleteBook,
   updateBook,
 } = require('../controllers/books');
+const { getGenreLivreById } = require('../controllers/genreLivre');
 const {
   BadRequestError,
   NotFoundError,
@@ -23,7 +24,9 @@ const NOSTRING_REGEX = /^\d+$/;
 
 booksRouter.get('/books', async (request, response) => {
   console.log('console log de request.query:', request.query);
-  const books = await getAllBooks(request.query.title);
+  const books = await getAllBooks(
+    request.query.title || request.query.name,
+  );
   response.status(OK).json(books);
 });
 
@@ -66,9 +69,13 @@ booksRouter.post(
       );
     }
     console.log('console log de request.file :', request.file.path);
-    const newBook = await addBook(request.body);
-    // const uploadPicture = await booksController.addBook(request.file);
 
+    const newBook = await addBook(request.body);
+    const genreLivreFound = await getGenreLivreById(
+      request.body.genreLivreId,
+    );
+    // const uploadPicture = await booksController.addBook(request.file);
+    console.log('console log de GenreLivre :', genreLivreFound);
     return response.status(CREATED).json({
       id: newBook.id,
       ISBN: newBook.ISBN,
@@ -78,6 +85,7 @@ booksRouter.post(
       publicationDate: newBook.publicationDate,
       pagesNumber: newBook.pagesNumber,
       language: newBook.language,
+      genreLivreId: genreLivreFound.name,
       // photo: uploadPicture.path,
     });
   },

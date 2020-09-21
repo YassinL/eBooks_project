@@ -1,5 +1,7 @@
+const { v4: uuidv4 } = require('uuid');
 const models = require('../../models');
-const { Books } = models;
+const { Books, GenreLivres } = models;
+const { Op } = require('sequelize');
 
 const booksAttributes = [
   'ISBN',
@@ -21,10 +23,12 @@ module.exports = {
       publicationDate,
       pagesNumber,
       language,
-      photo,
+      genreLivreId,
+      // photo,
     } = data;
 
     return Books.create({
+      id: uuidv4(),
       ISBN,
       title,
       summary,
@@ -32,19 +36,34 @@ module.exports = {
       publicationDate,
       pagesNumber,
       language,
-      photo,
+      genreLivreId,
+      // photo,
     });
   },
 
   getAllBooks: async (data) => {
     if (data) {
       return await Books.findAll({
-        where: { title: data },
+        where: {
+          [Op.or]: [{ title: data }, { genreLivreId: data }],
+        },
+        include: [
+          {
+            model: GenreLivres,
+            attributes: ['name'],
+          },
+        ],
         attributes: booksAttributes,
         raw: true,
       });
     } else {
       return await Books.findAll({
+        include: [
+          {
+            model: GenreLivres,
+            attributes: ['name'],
+          },
+        ],
         attributes: booksAttributes,
       });
     }
@@ -54,6 +73,12 @@ module.exports = {
     return Books.findOne({
       where: { title: title },
       attributes: booksAttributes,
+      include: [
+        {
+          model: GenreLivres,
+          attributes: ['name'],
+        },
+      ],
     });
   },
 
