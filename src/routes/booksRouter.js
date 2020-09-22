@@ -3,7 +3,7 @@ require('express-async-errors');
 const booksRouter = express.Router();
 
 const { authenticateJWT } = require('../utils/jwt');
-const upload = require('../middlewares/upload');
+const { upload } = require('../middlewares');
 const {
   addBook,
   getAllBooks,
@@ -45,7 +45,7 @@ booksRouter.get('/books/:title', async (request, response) => {
 booksRouter.post(
   '/books',
   authenticateJWT,
-  upload.single('photo'),
+  upload,
   async (request, response) => {
     const { ISBN, summary } = request.body;
     const { roleAdmin } = request.user;
@@ -68,14 +68,17 @@ booksRouter.post(
         "Le champ résumé n'est pas renseigné",
       );
     }
-    console.log('console log de request.file :', request.file.path);
+    console.log('console log de request.file :', request.file);
 
     const newBook = await addBook(request.body);
     const genreLivreFound = await getGenreLivreById(
       request.body.genreLivreId,
     );
-    // const uploadPicture = await booksController.addBook(request.file);
-    console.log('console log de GenreLivre :', genreLivreFound);
+
+    const host = request.get('host');
+    const { filename } = request.file;
+
+    console.log('console log de PROTOCOL :', request.protocol);
     return response.status(CREATED).json({
       id: newBook.id,
       ISBN: newBook.ISBN,
@@ -86,7 +89,7 @@ booksRouter.post(
       pagesNumber: newBook.pagesNumber,
       language: newBook.language,
       genreLivreId: genreLivreFound.name,
-      // photo: uploadPicture.path,
+      uploadPicture: `${request.protocol}://${host}/uploads/${filename}`,
     });
   },
 );

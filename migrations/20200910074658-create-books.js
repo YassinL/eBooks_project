@@ -3,10 +3,6 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Books', {
       id: {
-        // allowNull: false,
-        // autoIncrement: true,
-        // primaryKey: true,
-        // type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
         type: Sequelize.UUID,
@@ -50,10 +46,10 @@ module.exports = {
           key: 'id',
         },
       },
-      // photo: {
-      //   allowNull: false,
-      //   type: Sequelize.STRING(255),
-      // },
+      uploadPicture: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

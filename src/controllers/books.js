@@ -11,6 +11,7 @@ const booksAttributes = [
   'publicationDate',
   'pagesNumber',
   'language',
+  'photo',
 ];
 
 module.exports = {
@@ -24,7 +25,7 @@ module.exports = {
       pagesNumber,
       language,
       genreLivreId,
-      // photo,
+      uploadPicture,
     } = data;
 
     return Books.create({
@@ -37,7 +38,7 @@ module.exports = {
       pagesNumber,
       language,
       genreLivreId,
-      // photo,
+      uploadPicture: '',
     });
   },
 

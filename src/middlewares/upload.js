@@ -1,37 +1,33 @@
 const multer = require('multer');
+const moment = require('moment');
 
 // const storage = multer.memoryStorage();
 const storage = multer.diskStorage({
-  destination: (request, file, cb) => {
-    cb(null, './uploads/');
+  destination: (request, file, callback) => {
+    callback(null, 'uploads');
   },
 
-  filename: (request, file, cb) => {
-    cb(
-      null,
-      file.fieldname + '- ' + Date.now() + '-' + file.originalname,
-    );
+  filename: (request, file, callback) => {
+    const date = moment().format('YYYY-MM-DD-HHmmss');
+    callback(null, `${file.fieldname}-${date}-${file.originalname}`);
   },
 });
 
-const fileFilter = (request, file, cb) => {
+const fileFilter = (request, file, callback) => {
   if (
     file.mimetype === 'image/jpg' ||
     file.mimetype === 'image/jpeg' ||
     file.mimetype === 'image/png'
   ) {
-    cb(null, true);
+    callback(null, true);
   } else {
-    cb(null, false);
+    callback(null, false);
   }
 };
 
 const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: 1024 * 1024 * 5,
-  },
+  storage,
+  fileFilter,
 });
 
-module.exports = upload;
+module.exports = upload.single('file');

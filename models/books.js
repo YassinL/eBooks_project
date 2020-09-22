@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       pagesNumber: DataTypes.INTEGER,
       language: DataTypes.STRING,
       genreLivreId: DataTypes.INTEGER,
-      // photo: DataTypes.STRING
+      uploadPicture: DataTypes.STRING,
     },
     {
       sequelize,
