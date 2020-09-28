@@ -21,7 +21,7 @@ server.use(bodyParser.urlencoded({ extended: true }));
 
 // ici on appelle les routes du dossier routes
 server.use(morgan('dev'));
-server.use(routes);
+server.use('/api', routes);
 
 // Gestion des erreurs
 server.use('*', notFoundHandler);

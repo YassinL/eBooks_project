@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const models = require('../../models');
 const { Books, GenreLivres } = models;
 const { Op } = require('sequelize');
+const { pick } = require('lodash');
 
 const booksAttributes = [
   'ISBN',
@@ -11,7 +12,8 @@ const booksAttributes = [
   'publicationDate',
   'pagesNumber',
   'language',
-  'photo',
+  'genreLivreId',
+  'uploadPicture',
 ];
 
 module.exports = {
@@ -28,6 +30,7 @@ module.exports = {
       uploadPicture,
     } = data;
 
+    // const newBook = pick(data, booksAttributes);
     return Books.create({
       id: uuidv4(),
       ISBN,
@@ -38,7 +41,7 @@ module.exports = {
       pagesNumber,
       language,
       genreLivreId,
-      uploadPicture: '',
+      uploadPicture,
     });
   },
 
@@ -46,7 +49,11 @@ module.exports = {
     if (data) {
       return await Books.findAll({
         where: {
-          [Op.or]: [{ title: data }, { genreLivreId: data }],
+          [Op.or]: [
+            { title: data },
+            { genreLivreId: data },
+            { author: data },
+          ],
         },
         include: [
           {
@@ -89,34 +96,56 @@ module.exports = {
     });
   },
 
-  updateBook: async (bookId, data) => {
-    const [, affectedRow] = await Books.update(data, {
-      where: { id: bookId },
-      returning: true,
-      plain: true,
+  // updateBook: async (bookId, data) => {
+  //   const [, affectedRow] = await Books.update(data, {
+  //     where: { id: bookId },
+  //     include: [
+  //       {
+  //         model: GenreLivres,
+  //         attributes: ['name'],
+  //       },
+  //     ],
+  //     returning: true,
+  //     plain: true,
+  //     attributes: booksAttributes,
+  //   });
+  //   const {
+  //     id,
+  //     ISBN,
+  //     title,
+  //     summary,
+  //     author,
+  //     publicationDate,
+  //     pagesNumber,
+  //     language,
+  //     genreLivreId,
+  //   } = affectedRow;
+  //   const updatedData = {
+  //     id,
+  //     ISBN,
+  //     title,
+  //     summary,
+  //     author,
+  //     publicationDate,
+  //     pagesNumber,
+  //     language,
+  //     genreLivreId,
+  //   };
+  //   return updatedData;
+  // },
+
+  updateBook: async (data, bookId) => {
+    const bookFound = await Books.findByPk(bookId, {
+      include: [
+        {
+          model: GenreLivres,
+          attributes: ['name'],
+        },
+      ],
     });
-    const {
-      id,
-      ISBN,
-      title,
-      summary,
-      author,
-      publicationDate,
-      pagesNumber,
-      language,
-      photo,
-    } = affectedRow;
-    const updatedData = {
-      id,
-      ISBN,
-      title,
-      summary,
-      author,
-      publicationDate,
-      pagesNumber,
-      language,
-      photo,
-    };
-    return updatedData;
+    if (!bookFound) {
+      return bookFound;
+    }
+    return bookFound.update(data);
   },
 };

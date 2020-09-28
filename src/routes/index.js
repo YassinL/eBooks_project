@@ -1,23 +1,18 @@
 const express = require('express');
+require('express-async-errors');
 const router = express.Router();
 
 const signUpRouter = require('./signUpRouter');
 const signInRouter = require('./signInRouter');
 const booksRouter = require('./booksRouter');
-
-const bodyParser = require('body-parser');
-
-// Middleware
-router.use(bodyParser.json());
-
-//Page accueil
-router.get('/', (request, response) => {
-  response.json({ message: 'Hello Books' });
-});
+const orderRouter = require('./orderRouter');
+const genreLivreRouter = require('./genreLivreRouter');
 
 // Routes
-router.use('/api', signUpRouter);
-router.use('/api', signInRouter);
-router.use('/api', booksRouter);
+router.use(signUpRouter);
+router.use(signInRouter);
+router.use(booksRouter);
+router.use(genreLivreRouter);
+router.use(orderRouter);
 
 module.exports = router;

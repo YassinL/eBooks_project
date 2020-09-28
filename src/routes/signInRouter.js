@@ -1,5 +1,4 @@
 const express = require('express');
-require('express-async-errors');
 
 const usersController = require('../controllers/users');
 const jwtUtils = require('../utils/jwt');

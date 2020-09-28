@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.GenreLivres, {
         foreignKey: 'genreLivreId',
       });
+      this.belongsToMany(models.Order, {
+        through: 'OrderBooks',
+        foreignKey: 'booksId',
+        as: 'orders',
+      });
     }
   }
   Books.init(
