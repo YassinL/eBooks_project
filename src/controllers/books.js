@@ -3,6 +3,7 @@ const models = require('../../models');
 const { Books, GenreLivres } = models;
 const { Op } = require('sequelize');
 const { pick } = require('lodash');
+const { getGenreLivreByName } = require('./genreLivre');
 
 const booksAttributes = [
   'ISBN',
@@ -12,12 +13,16 @@ const booksAttributes = [
   'publicationDate',
   'pagesNumber',
   'language',
-  'genreLivreId',
   'uploadPicture',
+  'price',
 ];
 
 module.exports = {
-  addBook: (data) => {
+  addBook: async (data) => {
+    const genreLivreFound = await getGenreLivreByName(
+      data.genreLivreId,
+    );
+
     const {
       ISBN,
       title,
@@ -26,12 +31,11 @@ module.exports = {
       publicationDate,
       pagesNumber,
       language,
-      genreLivreId,
       uploadPicture,
+      price,
     } = data;
 
-    // const newBook = pick(data, booksAttributes);
-    return Books.create({
+    const createBook = await Books.create({
       id: uuidv4(),
       ISBN,
       title,
@@ -40,41 +44,28 @@ module.exports = {
       publicationDate,
       pagesNumber,
       language,
-      genreLivreId,
+      genreLivreId: genreLivreFound.id,
       uploadPicture,
+      price,
     });
+    const books = await Books.findByPk(createBook.id, {
+      include: [
+        {
+          model: GenreLivres,
+          attributes: ['name'],
+        },
+      ],
+      attributes: booksAttributes,
+    });
+    return books;
   },
 
-  getAllBooks: async (data) => {
-    if (data) {
-      return await Books.findAll({
-        where: {
-          [Op.or]: [
-            { title: data },
-            { genreLivreId: data },
-            { author: data },
-          ],
-        },
-        include: [
-          {
-            model: GenreLivres,
-            attributes: ['name'],
-          },
-        ],
-        attributes: booksAttributes,
-        raw: true,
-      });
-    } else {
-      return await Books.findAll({
-        include: [
-          {
-            model: GenreLivres,
-            attributes: ['name'],
-          },
-        ],
-        attributes: booksAttributes,
-      });
-    }
+  getAllBooks: async (filters) => {
+    console.log('FILTERs', filters);
+    return await Books.findAll({
+      where: filters,
+      attributes: booksAttributes,
+    });
   },
 
   getBook: (title) => {

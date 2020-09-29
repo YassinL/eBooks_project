@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       language: DataTypes.STRING,
       genreLivreId: DataTypes.INTEGER,
       uploadPicture: DataTypes.STRING,
+      price: DataTypes.INTEGER,
     },
     {
       sequelize,

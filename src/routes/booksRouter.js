@@ -25,14 +25,9 @@ const { request, response } = require('express');
 const NOSTRING_REGEX = /^\d+$/;
 
 booksRouter.get('/books', async (request, response) => {
-  // const genreLivreName = await getGenreLivreByName(
-  //   request.query.name,
-  // );
-  const books = await getAllBooks(
-    request.query.title ||
-      request.query.genreLivreId ||
-      request.query.author,
-  );
+  console.log(request.query);
+
+  const books = await getAllBooks(request.query);
   if (books.length === 0 || books === null) {
     throw new NotFoundError(
       'Ressources introuvables',
@@ -41,7 +36,7 @@ booksRouter.get('/books', async (request, response) => {
   }
   response.status(OK).json(books);
 });
-
+// genreLivreId: findGenre.name,
 booksRouter.get('/books/:title', async (request, response) => {
   const books = await getBook(request.params.title);
   if (!books) {
@@ -88,20 +83,7 @@ booksRouter.post(
       uploadPicture: `${request.protocol}://${host}/uploads/${filename}`,
     });
 
-    const genreLivreFound = await getGenreLivreById(
-      request.body.genreLivreId,
-    );
-
-    return response.status(CREATED).json({
-      ISBN: newBook.ISBN,
-      title: newBook.title,
-      summary: newBook.summary,
-      author: newBook.author,
-      publicationDate: newBook.publicationDate,
-      pagesNumber: newBook.pagesNumber,
-      genreLivreId: genreLivreFound.name,
-      uploadPicture: `${request.protocol}://${host}/uploads/${filename}`,
-    });
+    return response.status(CREATED).json(newBook);
   },
 );
 

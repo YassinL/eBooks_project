@@ -25,7 +25,6 @@ module.exports = {
       where: {
         name: name,
       },
-      attributes: ['id', 'name'],
     });
   },
 };
