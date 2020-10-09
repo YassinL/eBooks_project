@@ -21,6 +21,16 @@ module.exports = (sequelize, DataTypes) => {
   }
   Books.init(
     {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        allowNull: false,
+        defaultValue: DataTypes.UUIDV4,
+        validate: {
+          notNull: true,
+          isUUID: 4,
+        },
+      },
       ISBN: DataTypes.STRING,
       title: DataTypes.STRING,
       summary: DataTypes.STRING,

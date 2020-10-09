@@ -14,6 +14,7 @@ const {
   errorHandler,
 } = require('./src/middlewares');
 
+server.use('/uploads', express.static((__dirname, 'uploads')));
 // Middleware
 server.use(cors());
 server.use(bodyParser.json());

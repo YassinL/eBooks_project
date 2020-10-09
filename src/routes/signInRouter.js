@@ -23,9 +23,8 @@ signInRouter.post('/signin', async (req, res) => {
       res.status(OK).json({
         token: jwtUtils.genToken(userFound),
         user: {
-          role: userFound.role,
-          first_name: userFound.first_name,
-          last_name: userFound.last_name,
+          firstName: userFound.firstName,
+          lastName: userFound.lastName,
           email: userFound.email,
         },
       });

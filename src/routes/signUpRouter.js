@@ -1,6 +1,7 @@
 const express = require('express');
 const signUpRouter = express.Router();
-const usersController = require('../controllers/users');
+
+const { checkEmail, addUser } = require('../controllers/users');
 
 const {
   BadRequestError,
@@ -54,9 +55,9 @@ signUpRouter.post('/signup', async (request, response) => {
     );
   }
 
-  const userFound = await usersController.checkEmail(email);
+  const userFound = await checkEmail(email);
   if (userFound === null) {
-    const newUser = await usersController.addUser(request.body);
+    const newUser = await addUser(request.body);
 
     response.status(CREATED).json({ newUser });
   } else {

@@ -4,6 +4,8 @@ const { Books, GenreLivres } = models;
 const { Op } = require('sequelize');
 const { pick } = require('lodash');
 const { getGenreLivreByName } = require('./genreLivre');
+const { NotFoundError } = require('../helpers/errors');
+const fs = require('fs');
 
 const booksAttributes = [
   'ISBN',
@@ -14,11 +16,21 @@ const booksAttributes = [
   'pagesNumber',
   'language',
   'uploadPicture',
+  'genreLivreId',
   'price',
 ];
 
+const deleteImage = async (bookFound) => {
+  const [, filename] = bookFound.uploadPicture.split('/uploads/');
+  fs.unlink(`uploads/${filename}`, (error) => {
+    if (error) throw new Error(error);
+  });
+};
+
 module.exports = {
   addBook: async (data) => {
+    // const bookToAdd = pick(data, booksAttributes);
+    // const createBook = await Books.create(bookToAdd);
     const genreLivreFound = await getGenreLivreByName(
       data.genreLivreId,
     );
@@ -36,7 +48,6 @@ module.exports = {
     } = data;
 
     const createBook = await Books.create({
-      id: uuidv4(),
       ISBN,
       title,
       summary,
@@ -57,13 +68,24 @@ module.exports = {
       ],
       attributes: booksAttributes,
     });
+
+    // const newBook = {
+    //   ...pick(books, booksAttributes),
+    //   // genreLivreId: genreLivreFound.id,
+    // };
     return books;
   },
 
   getAllBooks: async (filters) => {
     console.log('FILTERs', filters);
-    return await Books.findAll({
+    const filterBook = await Books.findAll({
       where: filters,
+      attributes: booksAttributes,
+    });
+    if (filterBook) {
+      return filterBook;
+    }
+    return await Books.findAll({
       attributes: booksAttributes,
     });
   },
@@ -81,8 +103,18 @@ module.exports = {
     });
   },
 
-  deleteBook: (title) => {
-    return Books.destroy({
+  deleteBook: async (title) => {
+    const bookFound = await Books.findOne({
+      where: { title: title },
+    });
+    if (!bookFound) {
+      throw new NotFoundError(
+        'Ressource introuvable',
+        "ce livre n'existe pas",
+      );
+    }
+    await deleteImage(bookFound);
+    await Books.destroy({
       where: { title: title },
     });
   },
@@ -125,18 +157,32 @@ module.exports = {
   //   return updatedData;
   // },
 
-  updateBook: async (data, bookId) => {
-    const bookFound = await Books.findByPk(bookId, {
+  updateBook: async (title, data) => {
+    const genreLivreFound = await getGenreLivreByName(
+      data.genreLivreId,
+    );
+    console.log('DATA', data);
+    const bookFound = await Books.findOne({
       include: [
         {
           model: GenreLivres,
           attributes: ['name'],
         },
       ],
+      where: { title: title },
     });
     if (!bookFound) {
-      return bookFound;
+      throw new NotFoundError(
+        'Ressource introuvable',
+        "Ce livre n'existe pas",
+      );
     }
-    return bookFound.update(data);
+    // if (bookFound.uploadPicture !== data.uploadPicture) {
+    //   await deleteImage(bookFound);
+    // }
+    return bookFound.update({
+      ...data,
+      genreLivreId: genreLivreFound.id,
+    });
   },
 };

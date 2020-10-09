@@ -53,6 +53,8 @@ booksRouter.post(
   authenticateJWT,
   upload,
   async (request, response) => {
+    // const books = JSON.parse(request.body.books);
+    // console.log(books);
     const { ISBN, summary } = request.body;
     const { roleAdmin } = request.user;
 
@@ -78,43 +80,19 @@ booksRouter.post(
     const host = request.get('host');
     const { filename } = request.file;
 
-    const newBook = await addBook({
+    const bookAdd = {
       ...request.body,
       uploadPicture: `${request.protocol}://${host}/uploads/${filename}`,
-    });
+    };
+    const newBook = await addBook(bookAdd);
 
     return response.status(CREATED).json(newBook);
   },
 );
 
-// Update a Book
-// booksRouter.put(
-//   '/books/:bookId',
-//   authenticateJWT,
-//   async (request, response) => {
-//     const { roleAdmin } = request.user;
-//     if (roleAdmin === false) {
-//       throw new UnAuthorizedError(
-//         'Accès non autorisé',
-//         'Vous devez être admin pour modifier une annonce de livre',
-//       );
-//     }
-//     const { bookId } = request.params;
-//     const data = request.body;
-//     const updateBooks = await updateBook(bookId, data);
-
-//     if (!updateBooks) {
-//       throw new NotFoundError();
-//     }
-//     response.status(OK).json({
-//       updateBooks,
-//       message: "l'annonce de livre à bien été modifié",
-//     });
-//   },
-// );
-
+// Update Book
 booksRouter.put(
-  '/books/:bookId',
+  '/books/:title',
   authenticateJWT,
   async (request, response) => {
     const { roleAdmin } = request.user;
@@ -125,19 +103,19 @@ booksRouter.put(
       );
     }
     const updateBooks = await updateBook(
+      request.params.title,
       request.body,
-      request.params.bookId,
     );
     if (!updateBooks) {
       throw new NotFoundError();
     }
     response.status(OK).json({
       updateBooks,
-      // genreLivreId: updateBook.GenreLivre.name,
       message: "l'annonce de livre à bien été modifié",
     });
   },
 );
+
 // Delete a Book
 booksRouter.delete(
   '/books/:title',
@@ -151,10 +129,7 @@ booksRouter.delete(
       );
     }
 
-    const deleteBooks = await deleteBook(request.params.title);
-    if (!deleteBooks) {
-      throw new NotFoundError();
-    }
+    await deleteBook(request.params.title);
     response
       .status(OK)
       .json({ message: "L'annonce de livre a été supprimé" });

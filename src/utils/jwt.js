@@ -8,9 +8,12 @@ const secret = process.env.JWT_SIGN_SECRET;
 
 module.exports = {
   genToken: (userData) => {
+    console.log('UserData', userData);
     return jwt.sign(
       {
         userId: userData.id,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         roleAdmin: userData.roleAdmin,
       },
       secret,
@@ -33,7 +36,7 @@ module.exports = {
         }
 
         req.user = user;
-
+        console.log('req.user', req.user);
         next();
       });
     } else {

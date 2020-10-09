@@ -1,5 +1,5 @@
 const models = require('../../models');
-const { GenreLivres } = models;
+const { GenreLivres, Books } = models;
 
 module.exports = {
   addGenreLivre: (props) => {
@@ -25,6 +25,26 @@ module.exports = {
       where: {
         name: name,
       },
+    });
+  },
+
+  getAllGenreLivre: () => {
+    return GenreLivres.findAll({
+      attributes: ['name'],
+    });
+  },
+
+  getBooksByGenreLivre: (name) => {
+    return Books.findAll({
+      include: [
+        {
+          model: GenreLivres,
+          attributes: ['name'],
+          where: {
+            name: name,
+          },
+        },
+      ],
     });
   },
 };
