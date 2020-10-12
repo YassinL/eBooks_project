@@ -9,6 +9,7 @@ const {
   getBook,
   deleteBook,
   updateBook,
+  getSomeBooks,
 } = require('../controllers/books');
 const {
   getGenreLivreById,
@@ -43,6 +44,18 @@ booksRouter.get('/books/:title', async (request, response) => {
     throw new NotFoundError(
       'Ressource introuvable',
       "Ce livre n'existe pas",
+    );
+  }
+  response.status(OK).json(books);
+});
+
+booksRouter.get('/random-books', async (request, response) => {
+  const books = await getSomeBooks();
+  // const randomBooks = Math.floor(Math.random() * books);
+  if (books.length === 0 || books === null) {
+    throw new NotFoundError(
+      'Ressources introuvables',
+      "Ce livre n'existe pas ",
     );
   }
   response.status(OK).json(books);
@@ -94,6 +107,7 @@ booksRouter.post(
 booksRouter.put(
   '/books/:title',
   authenticateJWT,
+  upload,
   async (request, response) => {
     const { roleAdmin } = request.user;
     if (roleAdmin === false) {
@@ -101,6 +115,11 @@ booksRouter.put(
         'Accès non autorisé',
         'Vous devez être admin pour modifier une annonce de livre',
       );
+    }
+    if (request.file) {
+      const host = request.get('host');
+      const { filename } = request.file;
+      request.body.uploadPicture = `${request.protocol}://${host}/uploads/${filename}`;
     }
     const updateBooks = await updateBook(
       request.params.title,

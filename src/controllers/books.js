@@ -6,6 +6,7 @@ const { pick } = require('lodash');
 const { getGenreLivreByName } = require('./genreLivre');
 const { NotFoundError } = require('../helpers/errors');
 const fs = require('fs');
+const Sequelize = require('sequelize');
 
 const booksAttributes = [
   'ISBN',
@@ -87,6 +88,13 @@ module.exports = {
     }
     return await Books.findAll({
       attributes: booksAttributes,
+    });
+  },
+
+  getSomeBooks: async () => {
+    return Books.findAll({
+      order: Sequelize.literal('rand()'),
+      limit: 10,
     });
   },
 
@@ -177,9 +185,9 @@ module.exports = {
         "Ce livre n'existe pas",
       );
     }
-    // if (bookFound.uploadPicture !== data.uploadPicture) {
-    //   await deleteImage(bookFound);
-    // }
+    if (bookFound.uploadPicture !== data.uploadPicture) {
+      await deleteImage(bookFound);
+    }
     return bookFound.update({
       ...data,
       genreLivreId: genreLivreFound.id,

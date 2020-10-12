@@ -12,12 +12,10 @@ module.exports = {
     return jwt.sign(
       {
         userId: userData.id,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
         roleAdmin: userData.roleAdmin,
       },
       secret,
-      { expiresIn: '4h' },
+      // { expiresIn: '4h' },
     );
   },
 
