@@ -8,7 +8,7 @@ const {
   getGenreLivreByName,
   getBooksByGenreLivre,
 } = require('../controllers/genreLivre');
-const { ConflictError } = require('../helpers/errors');
+const { ConflictError, NotFoundError } = require('../helpers/errors');
 const { CREATED, OK } = require('../helpers/status_code');
 
 genreLivreRouter.get('/genre', async (request, response) => {

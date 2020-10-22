@@ -128,6 +128,7 @@ booksRouter.put(
     if (!updateBooks) {
       throw new NotFoundError();
     }
+    console.log('UPDATE', updateBooks);
     response.status(OK).json({
       updateBooks,
       message: "l'annonce de livre à bien été modifié",
