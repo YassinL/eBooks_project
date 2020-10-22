@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require('uuid');
+// const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 
 const models = require('../../models');
@@ -19,7 +19,7 @@ module.exports = {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     return Users.create({
-      id: uuidv4(),
+      // id: uuidv4(),
       firstName,
       lastName,
       email,
