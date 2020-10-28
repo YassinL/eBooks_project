@@ -188,6 +188,7 @@ module.exports = {
     if (bookFound.uploadPicture !== data.uploadPicture) {
       await deleteImage(bookFound);
     }
+
     return bookFound.update({
       ...data,
       genreLivreId: genreLivreFound.id,
