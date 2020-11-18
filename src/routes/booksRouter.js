@@ -38,8 +38,8 @@ booksRouter.get('/books', async (request, response) => {
   response.status(OK).json(books);
 });
 // genreLivreId: findGenre.name,
-booksRouter.get('/books/:title', async (request, response) => {
-  const books = await getBook(request.params.title);
+booksRouter.get('/books/:urlTitle', async (request, response) => {
+  const books = await getBook(request.params.urlTitle);
   if (!books) {
     throw new NotFoundError(
       'Ressource introuvable',
@@ -80,7 +80,7 @@ booksRouter.post(
     if (!NOSTRING_REGEX.test(ISBN)) {
       throw new BadRequestError(
         'Mauvaise requête',
-        'Le champ doit être un nombre entier',
+        'Le champ ISBN doit être un nombre entier',
       );
     }
     if (summary === null || summary === undefined || summary === '') {
@@ -95,6 +95,7 @@ booksRouter.post(
 
     const bookAdd = {
       ...request.body,
+      urlTitle: request.body.title.toLowerCase().replace(/ /g, '-'),
       uploadPicture: `${request.protocol}://${host}/uploads/${filename}`,
     };
     const newBook = await addBook(bookAdd);
@@ -105,7 +106,7 @@ booksRouter.post(
 
 // Update Book
 booksRouter.put(
-  '/books/:title',
+  '/books/:urlTitle',
   authenticateJWT,
   upload,
   async (request, response) => {
@@ -122,7 +123,7 @@ booksRouter.put(
       request.body.uploadPicture = `${request.protocol}://${host}/uploads/${filename}`;
     }
     const updateBooks = await updateBook(
-      request.params.title,
+      request.params.urlTitle,
       request.body,
     );
     if (!updateBooks) {
@@ -138,7 +139,7 @@ booksRouter.put(
 
 // Delete a Book
 booksRouter.delete(
-  '/books/:title',
+  '/books/:urlTitle',
   authenticateJWT,
   async (request, response) => {
     const { roleAdmin } = request.user;
@@ -149,7 +150,7 @@ booksRouter.delete(
       );
     }
 
-    await deleteBook(request.params.title);
+    await deleteBook(request.params.urlTitle);
     response
       .status(OK)
       .json({ message: "L'annonce de livre a été supprimé" });

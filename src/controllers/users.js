@@ -19,7 +19,6 @@ module.exports = {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     return Users.create({
-      // id: uuidv4(),
       firstName,
       lastName,
       email,

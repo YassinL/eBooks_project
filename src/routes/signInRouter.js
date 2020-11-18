@@ -26,6 +26,7 @@ signInRouter.post('/signin', async (req, res) => {
           firstName: userFound.firstName,
           lastName: userFound.lastName,
           email: userFound.email,
+          roleAdmin: userFound.roleAdmin,
         },
       });
     } else {

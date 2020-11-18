@@ -11,6 +11,7 @@ const Sequelize = require('sequelize');
 const booksAttributes = [
   'ISBN',
   'title',
+  'urlTitle',
   'summary',
   'author',
   'publicationDate',
@@ -39,6 +40,7 @@ module.exports = {
     const {
       ISBN,
       title,
+      urlTitle,
       summary,
       author,
       publicationDate,
@@ -51,6 +53,7 @@ module.exports = {
     const createBook = await Books.create({
       ISBN,
       title,
+      urlTitle,
       summary,
       author,
       publicationDate,
@@ -98,22 +101,23 @@ module.exports = {
     });
   },
 
-  getBook: (title) => {
+  getBook: (urlTitle) => {
     return Books.findOne({
-      where: { title: title },
+      where: { urlTitle: urlTitle },
       attributes: booksAttributes,
       include: [
         {
           model: GenreLivres,
           attributes: ['name'],
+          raw: true,
         },
       ],
     });
   },
 
-  deleteBook: async (title) => {
+  deleteBook: async (urlTitle) => {
     const bookFound = await Books.findOne({
-      where: { title: title },
+      where: { urlTitle: urlTitle },
     });
     if (!bookFound) {
       throw new NotFoundError(
@@ -121,9 +125,11 @@ module.exports = {
         "ce livre n'existe pas",
       );
     }
-    await deleteImage(bookFound);
+    if (bookFound.uploadPicture) {
+      await deleteImage(bookFound);
+    }
     await Books.destroy({
-      where: { title: title },
+      where: { urlTitle: urlTitle },
     });
   },
 
@@ -153,7 +159,7 @@ module.exports = {
   //   } = affectedRow;
   //   const updatedData = {
   //     id,
-  //     ISBN,
+  //     ISBN,no such file or directory, unlink 'uploads/2020-10-13-163132_livres.png'
   //     title,
   //     summary,
   //     author,
@@ -165,7 +171,7 @@ module.exports = {
   //   return updatedData;
   // },
 
-  updateBook: async (title, data) => {
+  updateBook: async (urlTitle, data) => {
     const genreLivreFound = await getGenreLivreByName(
       data.genreLivreId,
     );
@@ -177,7 +183,7 @@ module.exports = {
           attributes: ['name'],
         },
       ],
-      where: { title: title },
+      where: { urlTitle: urlTitle },
     });
     if (!bookFound) {
       throw new NotFoundError(
