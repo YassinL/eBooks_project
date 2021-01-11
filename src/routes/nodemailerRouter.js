@@ -36,7 +36,7 @@ nodemailerRouter.post('/sendMail', async (request, response) => {
 
   const sendMail = await transporter.sendMail({
     from: 'ebooks.nodemailer@gmail.com',
-    to: 'leclercq.yassin@hotmail.fr',
+    to: 'yassin.leclercq1@gmail.com',
     subject,
     text,
   });
