@@ -10,8 +10,8 @@ const {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'ebooks.nodemailer@gmail.com',
-    pass: 'JeroBooks1',
+    user: process.env.USER_ADRESS_MAIL,
+    pass: process.env.MDP_MAIL,
   },
 });
 
@@ -35,8 +35,8 @@ nodemailerRouter.post('/sendMail', async (request, response) => {
     `;
 
   const sendMail = await transporter.sendMail({
-    from: 'ebooks.nodemailer@gmail.com',
-    to: 'yassin.leclercq1@gmail.com',
+    from: process.env.USER_ADRESS_MAIL,
+    to: process.env.TO_ADRESS_MAIL,
     subject,
     text,
   });
